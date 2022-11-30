@@ -43,7 +43,7 @@ jobs:
           node-version: 16.x
       - name: Yarn install
         run: yarn install --frozen-lockfile
-      - name: Lint
+      - name: Test
         run: yarn test
   release:
     name: Release
