@@ -11,7 +11,7 @@ $ yarn add @qte/nest-config
 Note that `zod` is a peer-dependency and must be installed separately.
 
 ## Quick start
-Import and use the module with a list of secrets to preload.
+Import and configure the module in the following way
 ```ts
 import { ConfigModule, ConfigService, DEVELOPMENT } from '@qte/nest-config'
 import { z } from 'zod'
@@ -44,6 +44,27 @@ The final configuration is built from first parsing `index.yaml`, then merging i
 
 ### Duplicate keys
 Duplicate object keys are merged recursively, while all other duplicates are overriden, and the environment configuration is prioritised.
+
+```yaml
+# index.yaml
+database:
+  user: postgres
+  password: development
+```
+```yaml
+# env.production.yaml
+database:
+  password: super-secret-prod-password # Ideally read from a secret
+```
+Merges to
+```ts
+const config = {
+  database: {
+    user: 'postgres',
+    password: 'super-secret-prod-password',
+  }
+}
+```
 
 ### Env and Secrets
 Configuration files can contain `ENV` values and Google Secrets Manager secrets. See examples below
