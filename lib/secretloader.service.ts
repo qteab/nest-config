@@ -4,7 +4,7 @@ import { SecretLoadException } from './exceptions'
 
 @Injectable()
 export class SecretLoaderService {
-  constructor(readonly secretManagerService: SecretManagerService) {}
+  constructor(private readonly secretManagerService: SecretManagerService) {}
   async loadSecret(secret: string, keyName: string) {
     try {
       const res = await this.secretManagerService.loadSecretDynamic(secret)
