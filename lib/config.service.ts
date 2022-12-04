@@ -30,9 +30,9 @@ export class ConfigService implements OnModuleInit {
 
   private config: unknown = {}
   constructor(
-    readonly configReaderService: ConfigReaderService,
-    readonly envLoaderService: EnvLoaderService,
-    readonly secretLoaderService: SecretLoaderService,
+    private readonly configReaderService: ConfigReaderService,
+    private readonly envLoaderService: EnvLoaderService,
+    private readonly secretLoaderService: SecretLoaderService,
     @Inject(CONFIG_OPTIONS_TOKEN) options: ConfigOptions,
   ) {
     this.options = options
