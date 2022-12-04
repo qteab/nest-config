@@ -283,4 +283,20 @@ describe('ConfigService', () => {
       from: 'super-secret-value',
     })
   })
+
+  it('Handles empty config files', async () => {
+    ;(mockedConfigReaderService.readConfigFile as jest.Mock).mockImplementation((fileName: string) => {
+      if (fileName === 'config/index.yaml') {
+        return Promise.resolve({
+          foo: 1,
+        })
+      }
+      return Promise.resolve(undefined)
+    })
+    await configService.onModuleInit()
+    const config = configService.getConfig<SchemaT>()
+    expect(config).toStrictEqual({
+      foo: 1,
+    })
+  })
 })
