@@ -48,7 +48,7 @@ export class ConfigService implements OnModuleInit {
 
   private async parseConfig() {
     const untransformedConfigs = await Promise.all(this.getFilesToRead().map((file) => this.configReaderService.readConfigFile(file)))
-    const configs = await Promise.all(untransformedConfigs.map((conf) => this.recursvieTransformFrom(conf, '') || {}))
+    const configs = await Promise.all(untransformedConfigs.filter((conf) => conf).map((conf) => this.recursvieTransformFrom(conf, '') || {}))
     const config = merge.withOptions({ mergeArrays: false }, ...configs)
     try {
       this.config = this.options.schema.strict().parse(config)
