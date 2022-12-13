@@ -92,7 +92,7 @@ z.object({
 The package caches secrets in development mode. Clear the cache by running
 ```sh
 rm -rf $TMPDIR/nest-config
-``
+```
 
 You can also disable caching by setting `cache: false` in the module options
 
