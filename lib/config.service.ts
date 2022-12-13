@@ -51,7 +51,7 @@ export class ConfigService implements OnModuleInit {
     const configs = await Promise.all(untransformedConfigs.filter((conf) => conf).map((conf) => this.recursvieTransformFrom(conf, '') || {}))
     const config = merge.withOptions({ mergeArrays: false }, ...configs)
     try {
-      this.config = this.options.schema.strict().parse(config)
+      this.config = this.options.schema.parse(config)
     } catch (e) {
       if (e instanceof ZodError) {
         throw new ValidationException(`Schema validation error, ${e.message}`)
@@ -87,7 +87,11 @@ export class ConfigService implements OnModuleInit {
         }
         const fromParent = result.data
         if (fromParent.$from.secret) {
-          const res = await this.secretLoaderService.loadSecret(fromParent.$from.secret, keyName)
+          const res = await this.secretLoaderService.loadSecret(
+            fromParent.$from.secret,
+            keyName,
+            this.options.env === DEVELOPMENT && this.options.cache !== false,
+          )
           return res
         }
         if (fromParent.$from.env) {
