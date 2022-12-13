@@ -10,4 +10,6 @@ export interface ConfigOptions {
   configPath?: string
   env: Environment
   schema: z.AnyZodObject
+  // Defaults to true
+  cache?: boolean
 }

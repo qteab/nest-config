@@ -16,17 +16,19 @@ describe('ConfigService', () => {
   let mockedConfigReaderService: ConfigReaderService
   let mockedEnvLoaderService: EnvLoaderService
   let mockedSecretLoaderService: SecretLoaderService
-  const schema = z.object({
-    foo: z.number(),
-    obj: z.optional(
-      z.object({
-        key1: z.string(),
-        key2: z.string(),
-      }),
-    ),
-    from: z.optional(z.string()),
-    list: z.optional(z.array(z.string())),
-  })
+  const schema = z
+    .object({
+      foo: z.number(),
+      obj: z.optional(
+        z.object({
+          key1: z.string(),
+          key2: z.string(),
+        }),
+      ),
+      from: z.optional(z.string()),
+      list: z.optional(z.array(z.string())),
+    })
+    .strict()
   type SchemaT = z.infer<typeof schema>
   beforeEach(async () => {
     mockedConfigReaderService = new ConfigReaderService()
@@ -113,20 +115,6 @@ describe('ConfigService', () => {
         key2: 'bar',
       },
     })
-  })
-
-  it('Throws on unknown keys', async () => {
-    ;(mockedConfigReaderService.readConfigFile as jest.Mock).mockImplementation(() => {
-      return Promise.resolve({
-        foo: 5,
-        obj: {
-          key2: 'bar',
-        },
-        fakeKey: 1,
-      })
-    })
-
-    await expect(configService.onModuleInit()).rejects.toThrow(ValidationException)
   })
 
   it('Throws if file reading fails', async () => {
