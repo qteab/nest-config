@@ -1,5 +1,5 @@
-const sum = (...numbers: number[]) => {
-  return numbers.reduce((tot, curr) => tot + curr, 0)
-}
-
-export { sum }
+export { ConfigModule } from './config.module'
+export { ConfigService } from './config.service'
+export { PRODUCTION, STAGING, DEVELOPMENT } from './constants'
+export { ConfigOptions } from './interfaces/options'
+export * from './exceptions'
