@@ -1,5 +1,5 @@
 export { ConfigModule } from './config.module'
-export { ConfigService } from './config.service'
+export { GetConfigService as ConfigService } from './getconfig.service'
 export { PRODUCTION, STAGING, DEVELOPMENT } from './constants'
 export { ConfigOptions } from './interfaces/options'
 export * from './exceptions'

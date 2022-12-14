@@ -6,6 +6,7 @@ import { ConfigService } from './config.service'
 import { DEVELOPMENT, INIT_TOKEN } from './constants'
 import { EnvLoaderService } from './envloader.service'
 import { ConfigReadException, ValidationException } from './exceptions'
+import { GetConfigService } from './getconfig.service'
 import { SecretLoaderService } from './secretloader.service'
 
 jest.mock('./config-reader.service.ts')
@@ -288,5 +289,46 @@ describe('ConfigService', () => {
     expect(config).toStrictEqual({
       foo: 1,
     })
+  })
+
+  it('Can be injected into a useFactory', async () => {
+    mockedConfigReaderService = new ConfigReaderService()
+    ;(mockedConfigReaderService.readConfigFile as jest.Mock).mockImplementation(() => {
+      return Promise.resolve({
+        foo: 1,
+      })
+    })
+    mockedEnvLoaderService = new EnvLoaderService()
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    mockedSecretLoaderService = new SecretLoaderService(null as any)
+    const moduleRef = await Test.createTestingModule({
+      imports: [
+        ConfigModule.forRoot({
+          env: DEVELOPMENT,
+          schema: schema,
+        }),
+      ],
+      providers: [
+        {
+          provide: 'SOME_FACTORY',
+          useFactory: (config: GetConfigService) => {
+            return config.getConfig<SchemaT>().foo
+          },
+          inject: [GetConfigService],
+        },
+      ],
+    })
+      .overrideProvider(ConfigReaderService)
+      .useValue(mockedConfigReaderService)
+      .overrideProvider(EnvLoaderService)
+      .useValue(mockedEnvLoaderService)
+      .overrideProvider(SecretLoaderService)
+      .useValue(mockedSecretLoaderService)
+      .compile()
+    const configService = moduleRef.get<ConfigService>(ConfigService)
+    // await configService.initModule()
+
+    const someFactory = moduleRef.get('SOME_FACTORY')
+    expect(someFactory).toEqual(1)
   })
 })
