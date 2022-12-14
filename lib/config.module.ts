@@ -3,7 +3,7 @@ import { SecretManagerModule } from '@qte/nest-google-secret-manager'
 import { ConfigReaderService } from './config-reader.service'
 import { ConfigService } from './config.service'
 import { EnvLoaderService } from './envloader.service'
-import { CONFIG_OPTIONS_TOKEN } from './constants'
+import { CONFIG_OPTIONS_TOKEN, INIT_TOKEN } from './constants'
 import { ConfigOptions } from './interfaces/options'
 import { SecretLoaderService } from './secretloader.service'
 
@@ -26,6 +26,14 @@ export class ConfigModule {
         {
           provide: CONFIG_OPTIONS_TOKEN,
           useValue: configOptions,
+        },
+        {
+          provide: INIT_TOKEN,
+          useFactory: async (configService: ConfigService) => {
+            await configService.initModule()
+            return null
+          },
+          inject: [ConfigService],
         },
       ],
       exports: [ConfigService],
