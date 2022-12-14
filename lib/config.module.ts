@@ -6,10 +6,11 @@ import { EnvLoaderService } from './envloader.service'
 import { CONFIG_OPTIONS_TOKEN, INIT_TOKEN } from './constants'
 import { ConfigOptions } from './interfaces/options'
 import { SecretLoaderService } from './secretloader.service'
+import { GetConfigService } from './getconfig.service'
 
 @Module({})
 export class ConfigModule {
-  public static forRoot(configOptions: ConfigOptions): DynamicModule {
+  public static async forRoot(configOptions: ConfigOptions): Promise<DynamicModule> {
     return {
       module: ConfigModule,
       global: true,
@@ -23,6 +24,7 @@ export class ConfigModule {
         ConfigReaderService,
         EnvLoaderService,
         SecretLoaderService,
+        GetConfigService,
         {
           provide: CONFIG_OPTIONS_TOKEN,
           useValue: configOptions,
@@ -36,7 +38,7 @@ export class ConfigModule {
           inject: [ConfigService],
         },
       ],
-      exports: [ConfigService],
+      exports: [GetConfigService],
     }
   }
 }
