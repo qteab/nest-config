@@ -1,4 +1,4 @@
-import { Inject, Injectable, OnModuleInit } from '@nestjs/common'
+import { Inject, Injectable } from '@nestjs/common'
 import path = require('path')
 import { ConfigReaderService } from './config-reader.service'
 import { CONFIG_OPTIONS_TOKEN, DEVELOPMENT, PRODUCTION, STAGING } from './constants'
@@ -25,7 +25,7 @@ const fromParentSchema = z
   .strict()
 
 @Injectable()
-export class ConfigService implements OnModuleInit {
+export class ConfigService {
   private readonly options: ConfigOptions
 
   private config: unknown = {}
@@ -38,7 +38,7 @@ export class ConfigService implements OnModuleInit {
     this.options = options
   }
 
-  async onModuleInit() {
+  async initModule() {
     await this.parseConfig()
   }
 

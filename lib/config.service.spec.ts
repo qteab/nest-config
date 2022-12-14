@@ -3,7 +3,7 @@ import { z } from 'zod'
 import { ConfigReaderService } from './config-reader.service'
 import { ConfigModule } from './config.module'
 import { ConfigService } from './config.service'
-import { DEVELOPMENT } from './constants'
+import { DEVELOPMENT, INIT_TOKEN } from './constants'
 import { EnvLoaderService } from './envloader.service'
 import { ConfigReadException, ValidationException } from './exceptions'
 import { SecretLoaderService } from './secretloader.service'
@@ -50,6 +50,8 @@ describe('ConfigService', () => {
       .useValue(mockedEnvLoaderService)
       .overrideProvider(SecretLoaderService)
       .useValue(mockedSecretLoaderService)
+      .overrideProvider(INIT_TOKEN)
+      .useValue(null)
       .compile()
 
     configService = moduleRef.get<ConfigService>(ConfigService)
@@ -62,7 +64,7 @@ describe('ConfigService', () => {
       })
     })
 
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
@@ -81,7 +83,7 @@ describe('ConfigService', () => {
       })
     })
 
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 5,
@@ -106,7 +108,7 @@ describe('ConfigService', () => {
       })
     })
 
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 5,
@@ -122,7 +124,7 @@ describe('ConfigService', () => {
       return Promise.reject(new ConfigReadException('Failed to read file'))
     })
 
-    await expect(configService.onModuleInit()).rejects.toThrow(ConfigReadException)
+    await expect(configService.initModule()).rejects.toThrow(ConfigReadException)
   })
 
   it('Can load secret', async () => {
@@ -137,7 +139,7 @@ describe('ConfigService', () => {
       })
     })
     ;(mockedSecretLoaderService.loadSecret as jest.Mock).mockResolvedValue('super-secret-value')
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
@@ -157,7 +159,7 @@ describe('ConfigService', () => {
       })
     })
     ;(mockedEnvLoaderService.loadEnv as jest.Mock).mockReturnValue('env-value')
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
@@ -179,7 +181,7 @@ describe('ConfigService', () => {
     })
     ;(mockedEnvLoaderService.loadEnv as jest.Mock).mockReturnValue('env-value')
     ;(mockedSecretLoaderService.loadSecret as jest.Mock).mockResolvedValue('super-secret-value')
-    await expect(configService.onModuleInit()).rejects.toThrow(ValidationException)
+    await expect(configService.initModule()).rejects.toThrow(ValidationException)
   })
 
   it('Throws if $from is in an object with more keys', async () => {
@@ -195,7 +197,7 @@ describe('ConfigService', () => {
       })
     })
     ;(mockedEnvLoaderService.loadEnv as jest.Mock).mockReturnValue('env-value')
-    await expect(configService.onModuleInit()).rejects.toThrow(ValidationException)
+    await expect(configService.initModule()).rejects.toThrow(ValidationException)
   })
 
   it('Throws on bad secret format', async () => {
@@ -210,7 +212,7 @@ describe('ConfigService', () => {
       })
     })
     ;(mockedSecretLoaderService.loadSecret as jest.Mock).mockResolvedValue('super-secret-value')
-    await expect(configService.onModuleInit()).rejects.toThrow(ValidationException)
+    await expect(configService.initModule()).rejects.toThrow(ValidationException)
   })
 
   it('Can load env and secret in list', async () => {
@@ -233,7 +235,7 @@ describe('ConfigService', () => {
     })
     ;(mockedSecretLoaderService.loadSecret as jest.Mock).mockResolvedValue('super-secret-value')
     ;(mockedEnvLoaderService.loadEnv as jest.Mock).mockReturnValue('env-value')
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
@@ -264,7 +266,7 @@ describe('ConfigService', () => {
     })
     ;(mockedSecretLoaderService.loadSecret as jest.Mock).mockResolvedValue('super-secret-value')
     ;(mockedEnvLoaderService.loadEnv as jest.Mock).mockReturnValue('env-value')
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
@@ -281,7 +283,7 @@ describe('ConfigService', () => {
       }
       return Promise.resolve(undefined)
     })
-    await configService.onModuleInit()
+    await configService.initModule()
     const config = configService.getConfig<SchemaT>()
     expect(config).toStrictEqual({
       foo: 1,
